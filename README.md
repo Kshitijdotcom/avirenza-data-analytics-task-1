@@ -4,7 +4,7 @@
 **Candidate:** Kshitij Hemchandra Gharat (AVZ-2026-000161)  
 **Due:** 4 December 2026
 
-> **Google Sheets Link:** `[https://docs.google.com/spreadsheets/d/1Jifp278QPRqny1jtW8uju4d7qUJWQl8XHR5p7xlIGwE/edit?usp=sharing]`
+> **Google Sheets Link:** [View Dataset on Google Sheets](https://docs.google.com/spreadsheets/d/1Jifp278QPRqny1jtW8uju4d7qUJWQl8XHR5p7xlIGwE/edit?usp=sharing)
 
 ---
 
