@@ -4,7 +4,7 @@
 **Candidate:** Kshitij Hemchandra Gharat (AVZ-2026-000161)  
 **Due:** 4 December 2026
 
-> 📊 **Google Sheets Link:** `[https://docs.google.com/spreadsheets/d/1Jifp278QPRqny1jtW8uju4d7qUJWQl8XHR5p7xlIGwE/edit?usp=sharing]`
+> **Google Sheets Link:** `[https://docs.google.com/spreadsheets/d/1Jifp278QPRqny1jtW8uju4d7qUJWQl8XHR5p7xlIGwE/edit?usp=sharing]`
 
 ---
 
@@ -81,7 +81,7 @@ avirenza-task1/
 | Average Order Value | ₹1,100 |
 | Return/Cancellation Rate | 23.1% |
 
-> 📌 **Revenue Rule:** Cancelled orders are excluded from Net Revenue (counted as ₹0). This is stated on the Dashboard.
+> **Revenue Rule:** Cancelled orders are excluded from Net Revenue (counted as Rs. 0). This is stated on the Dashboard.
 
 ---
 

@@ -712,7 +712,7 @@ for col in range(1, 17):
     cell.fill = header_fill(C_HEADER_BG)
 
 ws_db.merge_cells("A1:P1")
-title_cell = ws_db.cell(1, 1, "☕  ASSAM TEA CO. – Monthly Sales Dashboard  |  Jan–Mar 2026")
+title_cell = ws_db.cell(1, 1, "ASSAM TEA CO. – Monthly Sales Dashboard  |  Jan–Mar 2026")
 title_cell.font      = Font(bold=True, size=16, color=C_WHITE, name="Calibri")
 title_cell.alignment = center()
 
@@ -724,10 +724,10 @@ sub_cell.fill = header_fill("0D2218")
 
 # ── KPI Cards (row 4–7) ──────────────────────────
 kpi_data = [
-    ("💰 Net Revenue",          f"₹{total_net_revenue:,.0f}",  C_ACCENT,  "Delivered orders only"),
-    ("📦 Total Orders",         f"{total_orders:,}",           C_TEAL,    "Excl. duplicates"),
-    ("📊 Avg Order Value",      f"₹{avg_order_value:,.0f}",   C_ORANGE,  "Net Rev ÷ Orders"),
-    ("↩ Return/Cancel Rate",   f"{ret_canc_rate:.1f}%",       C_PURPLE,  "Returned + Cancelled"),
+    ("Net Revenue",          f"Rs.{total_net_revenue:,.0f}",  C_ACCENT,  "Delivered orders only"),
+    ("Total Orders",         f"{total_orders:,}",           C_TEAL,    "Excl. duplicates"),
+    ("Avg Order Value",      f"Rs.{avg_order_value:,.0f}",   C_ORANGE,  "Net Rev / Orders"),
+    ("Return/Cancel Rate",   f"{ret_canc_rate:.1f}%",       C_PURPLE,  "Returned + Cancelled"),
 ]
 
 kpi_cols = [1, 5, 9, 13]
@@ -845,15 +845,15 @@ slicer_note.alignment = center()
 ws_db.row_dimensions[51].height = 16
 ws_db.merge_cells("A51:P51")
 rule_note = ws_db.cell(51, 1,
-    "📌  Revenue Rule: Cancelled orders are EXCLUDED from Net Revenue calculations. "
-    "Returned orders are excluded from Net Revenue (set to ₹0 net).")
+    "Revenue Rule: Cancelled orders are EXCLUDED from Net Revenue calculations. "
+    "Returned orders are excluded from Net Revenue (set to Rs.0 net).")
 rule_note.font      = Font(size=9, color=C_ORANGE, bold=True, name="Calibri")
 rule_note.alignment = center()
 
 # ── Insights Section ──────────────────────────────
 ws_db.row_dimensions[53].height = 22
 ws_db.merge_cells("A53:P53")
-ins_title = ws_db.cell(53, 1, "📈  INSIGHTS & RECOMMENDATIONS")
+ins_title = ws_db.cell(53, 1, "INSIGHTS & RECOMMENDATIONS")
 ins_title.font      = Font(bold=True, size=12, color=C_WHITE, name="Calibri")
 ins_title.fill      = header_fill(C_HEADER_BG)
 ins_title.alignment = center()
@@ -1018,7 +1018,7 @@ wb._sheets = [wb[s] for s in sheet_order]
 # ══════════════════════════════════════════════════
 output_path = r"c:\Users\kshit\Desktop\internship\avirenza-task1\tea-brand-sales.xlsx"
 wb.save(output_path)
-print(f"✅ Workbook saved to: {output_path}")
+print(f"Workbook saved to: {output_path}")
 print(f"   Raw rows:   {len(clean_orders)}")
 print(f"   Clean rows: {len(clean_data)}")
 print(f"   Total Net Revenue: ₹{total_net_revenue:,.0f}")
