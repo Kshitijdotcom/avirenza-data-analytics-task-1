@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Assam Tea Co. – Monthly Sales Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Segoe UI',Arial,sans-serif;
+    background:#1a1f36;
+    color:#fff;
+    padding:18px;
+    min-height:100vh;
+  }
+
+  /* ── TOP BANNER ── */
+  .banner{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:16px;
+    gap:12px;
+  }
+  .banner-title h1{
+    font-size:26px;
+    font-weight:800;
+    color:#fff;
+    letter-spacing:0.5px;
+  }
+  .banner-title p{
+    font-size:12px;
+    color:#a0aec0;
+    margin-top:2px;
+  }
+  .month-badge{
+    background:#fff;
+    color:#1a1f36;
+    border-radius:10px;
+    padding:10px 20px;
+    text-align:center;
+    min-width:120px;
+  }
+  .month-badge .label{font-size:11px;color:#888;font-weight:600;}
+  .month-badge .value{font-size:18px;font-weight:800;color:#1a1f36;}
+
+  /* ── GRID ── */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    grid-auto-rows:auto;
+    gap:12px;
+  }
+
+  /* ── CARDS ── */
+  .card{
+    background:#252d47;
+    border-radius:12px;
+    padding:14px 16px;
+    display:flex;
+    flex-direction:column;
+  }
+  .card.white{
+    background:#fff;
+    color:#1a1f36;
+  }
+  .card-title{
+    font-size:11px;
+    font-weight:700;
+    color:#a0aec0;
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    margin-bottom:2px;
+  }
+  .card.white .card-title{color:#888;}
+  .card-sub{
+    font-size:10px;
+    color:#718096;
+    margin-bottom:8px;
+  }
+
+  /* ── KPI CARDS ── */
+  .kpi-row{
+    grid-column:span 8;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+  }
+  .kpi-card{
+    background:#fff;
+    border-radius:12px;
+    padding:14px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .kpi-icon{font-size:22px;}
+  .kpi-label{font-size:10px;color:#888;font-weight:600;margin-top:4px;}
+  .kpi-sub{font-size:9px;color:#aaa;}
+  .kpi-value{font-size:22px;font-weight:800;color:#1a1f36;margin-top:2px;}
+
+  /* ── HIGHLIGHT CARD ── */
+  .highlight-card{
+    background:#fff;
+    border-radius:12px;
+    padding:14px 16px;
+    grid-column:span 2;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    gap:6px;
+  }
+  .highlight-card .hl-label{font-size:10px;color:#888;font-weight:600;}
+  .highlight-card .hl-sub{font-size:9px;color:#aaa;}
+  .highlight-card .hl-value{font-size:22px;font-weight:800;color:#1a1f36;}
+
+  /* ── CHART CARDS ── */
+  .chart-card{
+    background:#252d47;
+    border-radius:12px;
+    padding:14px 16px;
+  }
+  .chart-card .card-title{color:#a0aec0;}
+  .chart-card .card-sub{color:#718096;}
+
+  /* ── STAT CARD ── */
+  .stat-row{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-top:6px;
+  }
+  .stat-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:11px;
+  }
+  .stat-label{color:#a0aec0;font-weight:600;}
+  .stat-pill{
+    background:#3a4568;
+    border-radius:20px;
+    padding:3px 12px;
+    font-weight:700;
+    font-size:12px;
+    color:#fff;
+    min-width:50px;
+    text-align:center;
+  }
+  .stat-pill.green{background:#38a169;}
+  .stat-pill.orange{background:#dd6b20;}
+  .stat-pill.blue{background:#3182ce;}
+  .stat-pill.purple{background:#6b46c1;}
+
+  /* ── DIVIDER ── */
+  .section-divider{
+    font-size:10px;
+    color:#4a5568;
+    font-weight:700;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    padding:4px 0;
+    border-top:1px solid #2d3748;
+    margin-top:4px;
+  }
+
+  /* span helpers */
+  .col-2{grid-column:span 2;}
+  .col-3{grid-column:span 3;}
+  .col-4{grid-column:span 4;}
+  .col-5{grid-column:span 5;}
+  .col-6{grid-column:span 6;}
+  .col-7{grid-column:span 7;}
+  .col-8{grid-column:span 8;}
+  .col-12{grid-column:span 12;}
+
+  canvas{max-width:100%;}
+
+  /* ── FOOTER NOTE ── */
+  .footer-note{
+    grid-column:span 12;
+    font-size:10px;
+    color:#4a5568;
+    text-align:center;
+    padding:6px;
+    border-top:1px solid #2d3748;
+    margin-top:4px;
+  }
+
+  /* top products list */
+  .top-prod-list{
+    list-style:none;
+    margin-top:6px;
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+  }
+  .top-prod-list li{
+    display:flex;
+    justify-content:space-between;
+    font-size:10px;
+    color:#cbd5e0;
+    padding:3px 6px;
+    border-radius:4px;
+    background:#1a1f36;
+  }
+  .top-prod-list li span{font-weight:700;color:#90cdf4;}
+</style>
+</head>
+<body>
+
+<!-- ══ TOP BANNER ══════════════════════════════════════ -->
+<div class="banner">
+  <div class="banner-title">
+    <h1>☕ ASSAM TEA CO. – SALES DASHBOARD</h1>
+    <p>Monthly D2C Sales Analysis &nbsp;·&nbsp; Jan – Mar 2026 &nbsp;·&nbsp; Kshitij Hemchandra Gharat (AVZ-2026-000161)</p>
+  </div>
+  <div class="month-badge">
+    <div class="label">Quarter</div>
+    <div class="value">Q1 2026</div>
+  </div>
+</div>
+
+<!-- ══ MAIN GRID ══════════════════════════════════════ -->
+<div class="grid">
+
+  <!-- ROW 1: 4 KPI cards + 1 Allocation donut + 1 highlight -->
+
+  <!-- KPI 1 -->
+  <div class="kpi-card col-2">
+    <div class="kpi-icon">💰</div>
+    <div class="kpi-label">Net Revenue</div>
+    <div class="kpi-sub">Delivered orders only</div>
+    <div class="kpi-value">₹4,37,689</div>
+  </div>
+
+  <!-- KPI 2 -->
+  <div class="kpi-card col-2">
+    <div class="kpi-icon">📦</div>
+    <div class="kpi-label">Total Orders</div>
+    <div class="kpi-sub">After deduplication</div>
+    <div class="kpi-value">398</div>
+  </div>
+
+  <!-- KPI 3 -->
+  <div class="kpi-card col-2">
+    <div class="kpi-icon">📊</div>
+    <div class="kpi-label">Avg Order Value</div>
+    <div class="kpi-sub">Net Rev ÷ Orders</div>
+    <div class="kpi-value">₹1,100</div>
+  </div>
+
+  <!-- KPI 4 -->
+  <div class="kpi-card col-2">
+    <div class="kpi-icon">↩</div>
+    <div class="kpi-label">Return/Cancel Rate</div>
+    <div class="kpi-sub">Returned + Cancelled</div>
+    <div class="kpi-value">23.1%</div>
+  </div>
+
+  <!-- Allocation donut -->
+  <div class="chart-card col-3">
+    <div class="card-title">Allocation Summary</div>
+    <div class="card-sub">Revenue share by category</div>
+    <canvas id="allocChart" height="130"></canvas>
+  </div>
+
+  <!-- Highlight card -->
+  <div class="highlight-card col-1" style="grid-column:span 1;">
+    <div class="hl-label">Top Month</div>
+    <div class="hl-sub">Highest Revenue</div>
+    <div class="hl-value" style="font-size:16px;">January</div>
+    <div style="font-size:11px;color:#555;font-weight:700;">₹1,55,536</div>
+  </div>
+
+  <!-- ROW 2: Bill summary bar | Cashflow horizontal bar | Expense donut | Stats -->
+
+  <!-- Bill / Channel bar -->
+  <div class="chart-card col-3">
+    <div class="card-title">Channel Summary</div>
+    <div class="card-sub">Net Revenue by Channel</div>
+    <canvas id="channelChart" height="140"></canvas>
+  </div>
+
+  <!-- Cashflow horizontal bar -->
+  <div class="chart-card col-4">
+    <div class="card-title">Monthly Cashflow</div>
+    <div class="card-sub">Revenue vs Target by Month</div>
+    <canvas id="cashflowChart" height="140"></canvas>
+  </div>
+
+  <!-- Expense donut -->
+  <div class="chart-card col-3">
+    <div class="card-title">Expense Summary</div>
+    <div class="card-sub">Revenue by Category</div>
+    <canvas id="expenseChart" height="140"></canvas>
+  </div>
+
+  <!-- Stats card -->
+  <div class="chart-card col-2">
+    <div class="card-title">● Channel vs Target</div>
+    <div class="card-sub">Performance Overview</div>
+    <div class="stat-row">
+      <div class="section-divider">Revenue Share</div>
+      <div class="stat-item">
+        <span class="stat-label">Website</span>
+        <span class="stat-pill green">51.2%</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Instagram</span>
+        <span class="stat-pill blue">34.8%</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">WhatsApp</span>
+        <span class="stat-pill purple">14.0%</span>
+      </div>
+      <div class="section-divider">Delivery Status</div>
+      <div class="stat-item">
+        <span class="stat-label">Delivered</span>
+        <span class="stat-pill green">76.9%</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Returned</span>
+        <span class="stat-pill orange">13.6%</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Cancelled</span>
+        <span class="stat-pill" style="background:#e53e3e;">9.5%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 3: Region bar | Monthly line | Top products -->
+
+  <!-- Region bar -->
+  <div class="chart-card col-3">
+    <div class="card-title">● Revenue by Region</div>
+    <div class="card-sub">Net Revenue – All Regions</div>
+    <canvas id="regionChart" height="140"></canvas>
+  </div>
+
+  <!-- Monthly line chart -->
+  <div class="chart-card col-6">
+    <div class="card-title">● Monthly Revenue Trend</div>
+    <div class="card-sub">Actual Net Revenue vs Target (Jan–Mar 2026)</div>
+    <canvas id="trendChart" height="120"></canvas>
+  </div>
+
+  <!-- Top products stats -->
+  <div class="chart-card col-3">
+    <div class="card-title">● Top Products</div>
+    <div class="card-sub">By Net Revenue (₹)</div>
+    <ul class="top-prod-list">
+      <li><span>Premium Tea Gift Hamper</span><span>₹69,180</span></li>
+      <li><span>Festive Gift Box</span><span>₹57,120</span></li>
+      <li><span>Darjeeling First Flush</span><span>₹54,340</span></li>
+      <li><span>Assam Classic Loose Leaf</span><span>₹48,900</span></li>
+      <li><span>Earl Grey Loose Leaf</span><span>₹41,230</span></li>
+      <li><span>Masala Chai Loose Leaf</span><span>₹38,760</span></li>
+      <li><span>Wellness Herbal Gift Box</span><span>₹35,100</span></li>
+    </ul>
+  </div>
+
+  <!-- ROW 4: Insights -->
+  <div class="chart-card col-12" style="padding:16px 20px;">
+    <div class="card-title" style="margin-bottom:8px;font-size:12px;">📈 INSIGHTS & RECOMMENDATIONS</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;">
+      <div style="background:#1a1f36;border-radius:8px;padding:10px;font-size:10px;color:#cbd5e0;line-height:1.5;">
+        <span style="color:#68d391;font-weight:700;">📌 Insight 1</span><br/>
+        January was the peak revenue month at <strong>₹1,55,536</strong>, followed by February (₹1,54,376). March dipped to ₹1,27,776 — warranting investigation.
+      </div>
+      <div style="background:#1a1f36;border-radius:8px;padding:10px;font-size:10px;color:#cbd5e0;line-height:1.5;">
+        <span style="color:#63b3ed;font-weight:700;">📌 Insight 2</span><br/>
+        <strong>Premium Tea Gift Hamper</strong> is the #1 SKU at ₹69,180 net revenue — a high-ticket item driving disproportionate value.
+      </div>
+      <div style="background:#1a1f36;border-radius:8px;padding:10px;font-size:10px;color:#cbd5e0;line-height:1.5;">
+        <span style="color:#f6ad55;font-weight:700;">📌 Insight 3</span><br/>
+        Website drives <strong>51.2%</strong> of revenue. Instagram contributes 34.8% — a strong secondary channel worth investing in.
+      </div>
+      <div style="background:#1a1f36;border-radius:8px;padding:10px;font-size:10px;color:#cbd5e0;line-height:1.5;">
+        <span style="color:#fc8181;font-weight:700;">📌 Insight 4</span><br/>
+        Return/Cancellation rate is <strong>23.1%</strong> — high for D2C. Returned + Cancelled orders reduce net revenue significantly.
+      </div>
+      <div style="background:#1a1f36;border-radius:8px;padding:10px;font-size:10px;color:#cbd5e0;line-height:1.5;">
+        <span style="color:#b794f4;font-weight:700;">📌 Insight 5</span><br/>
+        North-East region (brand's home) underperforms vs South & North — significant untapped potential in the home market.
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px;">
+      <div style="background:#2c3a1e;border-radius:8px;padding:10px;font-size:10px;color:#c6f6d5;line-height:1.5;border-left:3px solid #68d391;">
+        <strong>✅ Recommendation 1:</strong> Allocate 60% of Q2 marketing to Website SEO + Instagram reels targeting chai/wellness audiences to sustain and grow the Jan–Feb revenue levels.
+      </div>
+      <div style="background:#2c3a1e;border-radius:8px;padding:10px;font-size:10px;color:#c6f6d5;line-height:1.5;border-left:3px solid #68d391;">
+        <strong>✅ Recommendation 2:</strong> Launch a North-East awareness campaign with local Guwahati/Shillong influencer partnerships and a 'hometown pride' discount to unlock the brand's home market.
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-note">
+    📌 Revenue Rule: Cancelled orders are EXCLUDED from Net Revenue (Net Revenue = ₹0 for Cancelled). Returned orders are also excluded from revenue.
+    &nbsp;|&nbsp; Data: 400 raw orders · 398 clean orders · 15 data issues fixed · Jan–Mar 2026
+  </div>
+
+</div><!-- /grid -->
+
+<!-- ══ CHARTS JS ══════════════════════════════════════ -->
+<script>
+const NAVY   = '#252d47';
+const WHITE  = '#fff';
+const GRID_C = '#2d3748';
+
+Chart.defaults.color = '#a0aec0';
+Chart.defaults.font.family = "'Segoe UI', Arial, sans-serif";
+Chart.defaults.font.size   = 10;
+
+// ── 1. Allocation donut ──────────────────────────────
+new Chart(document.getElementById('allocChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Loose Leaf','Tea Bags','Gift Box','Accessories'],
+    datasets:[{
+      data:[38.4, 12.6, 40.8, 8.2],
+      backgroundColor:['#4299e1','#68d391','#f6ad55','#b794f4'],
+      borderWidth:2,
+      borderColor: NAVY,
+    }]
+  },
+  options:{
+    plugins:{
+      legend:{position:'bottom', labels:{boxWidth:10, padding:8, font:{size:9}}},
+      tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.parsed}%`}}
+    },
+    cutout:'65%',
+  }
+});
+
+// ── 2. Channel bar ───────────────────────────────────
+new Chart(document.getElementById('channelChart'), {
+  type:'bar',
+  data:{
+    labels:['Website','Instagram','WhatsApp'],
+    datasets:[{
+      label:'Net Revenue (₹)',
+      data:[224085, 152319, 61285],
+      backgroundColor:['#4299e1','#68d391','#f6ad55'],
+      borderRadius:4,
+    }]
+  },
+  options:{
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{grid:{color:GRID_C}, ticks:{font:{size:9}}},
+      y:{grid:{color:GRID_C}, ticks:{callback:v=>'₹'+v.toLocaleString('en-IN'), font:{size:9}}}
+    },
+  }
+});
+
+// ── 3. Cashflow horizontal bar ───────────────────────
+new Chart(document.getElementById('cashflowChart'), {
+  type:'bar',
+  data:{
+    labels:['January','February','March'],
+    datasets:[
+      {
+        label:'Actual',
+        data:[155536, 154376, 127776],
+        backgroundColor:'#4299e1',
+        borderRadius:4,
+      },
+      {
+        label:'Target',
+        data:[150000, 150000, 150000],
+        backgroundColor:'#2d3748',
+        borderRadius:4,
+      }
+    ]
+  },
+  options:{
+    indexAxis:'y',
+    plugins:{legend:{position:'top', labels:{boxWidth:10, padding:8, font:{size:9}}}},
+    scales:{
+      x:{grid:{color:GRID_C}, ticks:{callback:v=>'₹'+v.toLocaleString('en-IN'), font:{size:9}}},
+      y:{grid:{color:GRID_C}, ticks:{font:{size:9}}}
+    },
+  }
+});
+
+// ── 4. Expense donut ─────────────────────────────────
+new Chart(document.getElementById('expenseChart'), {
+  type:'doughnut',
+  data:{
+    labels:['Loose Leaf','Tea Bags','Gift Box','Accessories'],
+    datasets:[{
+      data:[168100, 55200, 178600, 35800],
+      backgroundColor:['#4299e1','#68d391','#f6ad55','#b794f4'],
+      borderWidth:2,
+      borderColor: NAVY,
+    }]
+  },
+  options:{
+    plugins:{
+      legend:{position:'bottom', labels:{boxWidth:10, padding:6, font:{size:9}}},
+      tooltip:{callbacks:{label:ctx=>`${ctx.label}: ₹${ctx.parsed.toLocaleString('en-IN')}`}}
+    },
+    cutout:'60%',
+  }
+});
+
+// ── 5. Region bar ────────────────────────────────────
+new Chart(document.getElementById('regionChart'), {
+  type:'bar',
+  data:{
+    labels:['South','North','West','East','N-East'],
+    datasets:[{
+      label:'Net Revenue (₹)',
+      data:[112400, 104300, 98200, 72100, 50700],
+      backgroundColor:['#68d391','#4299e1','#f6ad55','#b794f4','#fc8181'],
+      borderRadius:4,
+    }]
+  },
+  options:{
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{grid:{color:GRID_C}, ticks:{font:{size:9}}},
+      y:{grid:{color:GRID_C}, ticks:{callback:v=>'₹'+v.toLocaleString('en-IN'), font:{size:9}}}
+    },
+  }
+});
+
+// ── 6. Monthly trend line ────────────────────────────
+new Chart(document.getElementById('trendChart'), {
+  type:'line',
+  data:{
+    labels:['January','February','March'],
+    datasets:[
+      {
+        label:'Actual Revenue',
+        data:[155536, 154376, 127776],
+        borderColor:'#4299e1',
+        backgroundColor:'rgba(66,153,225,0.15)',
+        fill:true,
+        tension:0.4,
+        pointBackgroundColor:'#4299e1',
+        pointRadius:5,
+      },
+      {
+        label:'Target',
+        data:[150000, 150000, 150000],
+        borderColor:'#68d391',
+        borderDash:[6,3],
+        backgroundColor:'transparent',
+        tension:0,
+        pointRadius:3,
+        pointBackgroundColor:'#68d391',
+      }
+    ]
+  },
+  options:{
+    plugins:{legend:{position:'top', labels:{boxWidth:12, padding:10, font:{size:10}}}},
+    scales:{
+      x:{grid:{color:GRID_C}},
+      y:{
+        grid:{color:GRID_C},
+        ticks:{callback:v=>'₹'+v.toLocaleString('en-IN'), font:{size:9}},
+        min:100000
+      }
+    },
+  }
+});
+</script>
+</body>
+</html>
